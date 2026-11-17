@@ -69,6 +69,11 @@ client.on(Events.InteractionCreate,async i=>{
       store.claim(i.guildId,ticket.id,i.user.id);
       return await i.editReply(`You claimed ticket #${ticket.id}.`);
     }
+    if(i.commandName==='ticket-unclaim'){
+      if(!isStaff(member,ticket))throw new TicketError('Only support staff can release claims.');
+      store.unclaim(i.guildId,ticket.id,i.user.id,member.permissions.has(P.ManageGuild));
+      return await i.editReply(`Ticket #${ticket.id} is available for another staff member to claim.`);
+    }
     if(i.commandName==='ticket-close'){
       if(!isStaff(member,ticket)&&ticket.owner!==i.user.id)throw new TicketError('Only the owner or support staff can close this ticket.');
       if(closing.has(ticket.id))throw new TicketError('This ticket is already being closed.');

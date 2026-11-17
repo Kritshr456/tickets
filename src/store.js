@@ -33,6 +33,13 @@ export function openStore(path=':memory:') {
       const changed=db.prepare("UPDATE tickets SET claimed=? WHERE guild=? AND id=? AND status='open' AND claimed IS NULL").run(staff,guild,id).changes;
       if(!changed) throw new TicketError('Ticket is already claimed or is no longer open.');
     },
+    unclaim(guild,id,actor,isManager=false){
+      const ticket=get(guild,id);
+      if(!ticket || ticket.status!=='open' || !ticket.claimed) throw new TicketError('Only an open, claimed ticket can be released.');
+      if(ticket.claimed!==actor && !isManager) throw new TicketError('Only the current claimant or a server manager can release this claim.');
+      const changed=db.prepare("UPDATE tickets SET claimed=NULL WHERE guild=? AND id=? AND status='open' AND claimed=?").run(guild,id,ticket.claimed).changes;
+      if(!changed) throw new TicketError('The claim changed. Refresh and try again.');
+    },
     snapshot(guild,id,transcript){
       const t=get(guild,id);
       if(!t || !['open','closing'].includes(t.status)) throw new TicketError('Ticket is not open.');

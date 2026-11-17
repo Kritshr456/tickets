@@ -27,7 +27,7 @@ per database. Guild commands are registered in GUILD_ID only; deploy per server.
 2. Run `/ticket-config key:support parent:<category> staff:<role>` (Manage Server).
 3. Run `/ticket-panel category:support` in a public text channel (Manage Server).
 4. Members click **Open ticket**. Each person can have one active ticket per server.
-5. Support staff use `/ticket-claim`; the first claim wins.
+5. Support staff use `/ticket-claim`; the first claim wins. The claimant or a server manager can use `/ticket-unclaim` to make it available again. Other staff cannot release someone else's claim; closing tickets cannot be reassigned.
 6. The owner or staff use `/ticket-close`. A transcript is saved, then the channel
    is deleted. Failed deletion leaves a closing ticket that can be retried.
 7. `/ticket-transcript id:<number>` returns the saved file privately to the owner
@@ -70,3 +70,10 @@ npm audit --omit=dev
 Tests cover ticket uniqueness, exclusive claims, close persistence, guild
 isolation, category snapshots, transcript ordering and pagination limits.
 Live Discord channel permissions and gateway behavior require a test guild.
+
+## Updating
+
+Run `git pull --ff-only` and `npm ci`, then re-register the guild commands with
+`node --env-file=.env src/deploy.js` before restarting the bot.
+See [CHANGELOG.md](CHANGELOG.md) for the latest behavior changes. This update
+does not require a database migration.

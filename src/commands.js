@@ -12,6 +12,7 @@ export const commands=[
   command('ticket-panel','Post a ticket panel here',true)
     .addStringOption(o=>o.setName('category').setDescription('Configured category key').setRequired(true)),
   command('ticket-claim','Claim the current ticket'),
+  command('ticket-unclaim','Release the current ticket claim'),
   command('ticket-close','Archive and close the current ticket'),
   command('ticket-transcript','Download a saved transcript')
     .addIntegerOption(o=>o.setName('id').setDescription('Ticket ID').setMinValue(1).setRequired(true)),

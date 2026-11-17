@@ -1,6 +1,6 @@
 {
   "name": "tickets",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Private Discord support tickets and text transcripts",
   "type": "module",
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node src/index.js",
     "test": "node --test",
-    "check": "node --check src/index.js",
+    "check": "node scripts/check.js",
     "deploy": "node src/deploy.js"
   },
   "license": "MIT",

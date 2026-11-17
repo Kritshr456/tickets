@@ -24,3 +24,23 @@ test('pagination fetches all pages and refuses silent truncation',async()=>{
  n=0;await assert.rejects(collectMessages(channel,50),/exceeds/);
 });
 test('all command definitions serialize',()=>{for(const c of commands)assert.ok(c.toJSON().name);});
+test('claimants can release a ticket for another staff member',()=>{
+ const s=fixture();try{
+  const id=s.reserve('g','u','support');s.activate(id,'channel');s.claim('g',id,'staff1');
+  assert.throws(()=>s.unclaim('g',id,'staff2'));
+  assert.equal(s.get('g',id).claimed,'staff1');
+  s.unclaim('g',id,'staff1');assert.equal(s.get('g',id).claimed,null);
+  s.claim('g',id,'staff2');assert.equal(s.get('g',id).claimed,'staff2');
+  s.unclaim('g',id,'manager',true);assert.equal(s.get('g',id).claimed,null);
+  assert.throws(()=>s.unclaim('g',id,'manager',true));
+ }finally{s.close();}
+});
+test('unclaiming respects guild boundaries and ticket lifecycle',()=>{
+ const s=fixture();try{
+  const id=s.reserve('g','u','support');s.activate(id,'channel');s.claim('g',id,'staff');
+  assert.throws(()=>s.unclaim('other',id,'staff',true));
+  s.snapshot('g',id,'Saved transcript');assert.throws(()=>s.unclaim('g',id,'staff',true));
+  s.finish('g',id);assert.throws(()=>s.unclaim('g',id,'staff',true));
+  assert.equal(s.get('g',id).transcript,'Saved transcript');
+ }finally{s.close();}
+});
