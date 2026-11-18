@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add a private staff ticket queue with role-aware access, status/claim filters and pagination.
+
 ## 1.1.0
 
 - Add `/ticket-unclaim` for the current claimant or a server manager.

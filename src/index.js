@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits as I, Events, PermissionFlagsBits as P, ChannelType, MessageFlags,
   ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } from 'discord.js';
 import { openStore, TicketError } from './store.js';
+import { handleTicketList } from './ticket-list.js';
 import { collectMessages, renderTranscript } from './transcript.js';
 if(!process.env.DISCORD_TOKEN)throw Error('Missing DISCORD_TOKEN');
 const store=openStore(process.env.DATABASE_PATH || './data/app.sqlite');
@@ -53,6 +54,7 @@ client.on(Events.InteractionCreate,async i=>{
       await i.channel.send({content:`Open a ${key} support ticket. One active ticket per person.`,components:[new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId(`ticket:${key}`).setLabel('Open ticket').setStyle(ButtonStyle.Primary))]});
       return await i.editReply('Panel posted.');
     }
+    if(await handleTicketList(i,member,store))return;
     if(i.commandName==='ticket-history')return await i.editReply(store.history(i.guildId,i.user.id).map(t=>`#${t.id} • ${t.category} • ${t.status} • ${t.created} UTC`).join('\n')||'No tickets yet.');
     if(i.commandName==='ticket-transcript'){
       const t=store.get(i.guildId,i.options.getInteger('id',true));

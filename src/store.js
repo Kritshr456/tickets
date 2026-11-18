@@ -46,6 +46,22 @@ export function openStore(path=':memory:') {
       db.prepare("UPDATE tickets SET transcript=?,status='closing' WHERE guild=? AND id=?").run(transcript,guild,id);
     },
     finish:(guild,id)=>db.prepare("UPDATE tickets SET status='closed' WHERE guild=? AND id=? AND status='closing'").run(guild,id),
+    list({guild,roles=[],manager=false,status='active',mine=null,page=1}) {
+      if(!['active','creating','open','closing','closed'].includes(status))throw new TicketError('Invalid ticket status.');
+      if(!Number.isInteger(page)||page<1||page>100000)throw new TicketError('Invalid ticket page.');
+      if(!Array.isArray(roles)||roles.length>500||roles.some(role=>typeof role!=='string'))throw new TicketError('Invalid staff roles.');
+      const clauses=['guild=?'],args=[guild];
+      if(manager!==true){
+        if(!roles.length)return {page,status,total:0,rows:[]};
+        const unique=[...new Set(roles)];clauses.push(`staff IN (${unique.map(()=>'?').join(',')})`);args.push(...unique);
+      }
+      if(status==='active')clauses.push("status!='closed'");else{clauses.push('status=?');args.push(status);}
+      if(mine!==null){clauses.push('claimed=?');args.push(mine);}
+      const where=clauses.join(' AND ');
+      const total=db.prepare(`SELECT COUNT(*) AS total FROM tickets WHERE ${where}`).get(...args).total;
+      const rows=db.prepare(`SELECT id,owner,category,channel,claimed,status,created FROM tickets WHERE ${where} ORDER BY id LIMIT 5 OFFSET ?`).all(...args,(page-1)*5);
+      return {page,status,total,rows};
+    },
     history:(guild,owner)=>db.prepare('SELECT id,category,status,claimed,created FROM tickets WHERE guild=? AND owner=? ORDER BY id DESC LIMIT 10').all(guild,owner),
   };
 }

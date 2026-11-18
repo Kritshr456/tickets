@@ -16,5 +16,6 @@ export const commands=[
   command('ticket-close','Archive and close the current ticket'),
   command('ticket-transcript','Download a saved transcript')
     .addIntegerOption(o=>o.setName('id').setDescription('Ticket ID').setMinValue(1).setRequired(true)),
+  command('ticket-list','List tickets assigned to your staff roles').addStringOption(o=>o.setName('status').setDescription('Ticket state; defaults to active').addChoices(...['active','creating','open','closing','closed'].map(value=>({name:value,value})))).addBooleanOption(o=>o.setName('mine').setDescription('Only tickets claimed by you')).addIntegerOption(o=>o.setName('page').setDescription('Page, oldest first').setMinValue(1).setMaxValue(100000)),
   command('ticket-history','View your ten most recent tickets'),
 ];

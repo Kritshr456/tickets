@@ -77,3 +77,12 @@ Run `git pull --ff-only` and `npm ci`, then re-register the guild commands with
 `node --env-file=.env src/deploy.js` before restarting the bot.
 See [CHANGELOG.md](CHANGELOG.md) for the latest behavior changes. This update
 does not require a database migration.
+
+## Staff ticket queue
+
+`/ticket-list` privately lists five active tickets per page, oldest first. Filter
+with `status:open`, `status:closing`, `status:creating` or `status:closed`, use
+`mine:true` for your claims, and `page:2` for older pages. Only tickets whose saved
+staff role you currently hold are listed. Manage Server can list all tickets in
+the current server. No conversation text or transcripts are included.
+Re-register guild commands after updating.
