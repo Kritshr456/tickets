@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.1
 
 - Complete ticket closure even when Discord rejects the private status reply after the transcript is saved.
 
