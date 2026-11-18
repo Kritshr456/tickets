@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2
+
+- Delete ticket channels and persist closure without waiting for slow private replies, while preserving transcript-first ordering and deletion retries.
+
 ## 1.2.1
 
 - Complete ticket closure even when Discord rejects the private status reply after the transcript is saved.

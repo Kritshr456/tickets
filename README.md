@@ -99,3 +99,7 @@ Reconfiguring a category preserves its paused setting.
 Back up before upgrading, then restart and re-register commands. Existing
 categories are enabled by default during the automatic database upgrade.
 Restore the pre-upgrade backup to roll back to a release without category pausing.
+
+A slow private close reply does not delay channel deletion or freeing the owner's
+active-ticket slot. The transcript is still saved first. Deletion failures leave
+the ticket in closing state for retry and remain visible to the caller.

@@ -74,3 +74,17 @@ test('successful closure saves the transcript before notifying and deleting', as
   assert.deepEqual(operations, ['reply', 'delete']);
   assert.equal(store.get('guild', ticket.id).status, 'closed');
 });
+
+test('a slow private reply does not delay deleting the channel or freeing the owner slot', async t => {
+  const { store, ticket, interaction } = fixture(t);
+  let release, deleted = false;
+  interaction.editReply = () => new Promise(resolve => { release = resolve; });
+  interaction.channel.delete = async () => { deleted = true; };
+  const pending = closeTicket(store, interaction, ticket);
+  try {
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(deleted, true);
+    assert.equal(store.get('guild', ticket.id).status, 'closed');
+    assert.ok(store.reserve('guild', 'owner', 'support'));
+  } finally { release(); await pending; }
+});
