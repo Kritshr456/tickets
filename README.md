@@ -30,6 +30,7 @@ per database. Guild commands are registered in GUILD_ID only; deploy per server.
 5. Support staff use `/ticket-claim`; the first claim wins. The claimant or a server manager can use `/ticket-unclaim` to make it available again. Other staff cannot release someone else's claim; closing tickets cannot be reassigned.
 6. The owner or staff use `/ticket-close`. A transcript is saved, then the channel
    is deleted. Failed deletion leaves a closing ticket that can be retried.
+   A failed private status reply does not interrupt closure after the transcript is saved.
 7. `/ticket-transcript id:<number>` returns the saved file privately to the owner
    or the ticket's staff role. `/ticket-history` shows your last ten tickets.
 

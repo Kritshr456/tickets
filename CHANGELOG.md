@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Complete ticket closure even when Discord rejects the private status reply after the transcript is saved.
+
 ## 1.2.0
 
 - Pause/resume new category tickets without affecting ongoing conversations or existing panels.

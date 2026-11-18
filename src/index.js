@@ -2,7 +2,7 @@ import { Client, GatewayIntentBits as I, Events, PermissionFlagsBits as P, Chann
   ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } from 'discord.js';
 import { openStore, TicketError } from './store.js';
 import { handleTicketList, handleCategoryToggle } from './ticket-list.js';
-import { collectMessages, renderTranscript } from './transcript.js';
+import { closeTicket } from './close-ticket.js';
 if(!process.env.DISCORD_TOKEN)throw Error('Missing DISCORD_TOKEN');
 const store=openStore(process.env.DATABASE_PATH || './data/app.sqlite');
 const client=new Client({intents:[I.Guilds,I.GuildMessages,I.MessageContent],allowedMentions:{parse:[]}});
@@ -84,12 +84,7 @@ client.on(Events.InteractionCreate,async i=>{
       if(closing.has(ticket.id))throw new TicketError('This ticket is already being closed.');
       closing.add(ticket.id);
       try{
-        const messages=await collectMessages(i.channel);
-        const transcript=renderTranscript(ticket,messages);
-        store.snapshot(i.guildId,ticket.id,transcript);
-        await i.editReply(`Transcript saved. Closing ticket #${ticket.id}. Retrieve it using /ticket-transcript id:${ticket.id} in another channel.`);
-        await i.channel.delete(`Ticket ${ticket.id} closed by ${i.user.id}`);
-        store.finish(i.guildId,ticket.id);
+        await closeTicket(store,i,ticket);
       }finally{closing.delete(ticket.id);}
     }
   }catch(error){
