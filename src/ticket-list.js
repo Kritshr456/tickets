@@ -1,4 +1,5 @@
 import { EmbedBuilder, PermissionFlagsBits as P } from 'discord.js';
+import { TicketError } from './store.js';
 
 export async function handleTicketList(i, member, store) {
   if(i.commandName!=='ticket-list')return false;
@@ -10,5 +11,14 @@ export async function handleTicketList(i, member, store) {
   for(const t of result.rows)embed.addFields({name:`#${t.id} ${t.category} • ${t.status}`,value:
     `Owner: <@${t.owner}>\n${t.channel?`Channel: <#${t.channel}>`:'Channel creation pending'}\n${t.claimed?`Claimed by: <@${t.claimed}>`:'Unclaimed'}\n${t.created} UTC`});
   await i.editReply({embeds:[embed],allowedMentions:{parse:[]}});
+  return true;
+}
+
+export async function handleCategoryToggle(i, member, store) {
+  if(i.commandName!=='ticket-toggle')return false;
+  if(!member.permissions.has(P.ManageGuild))throw new TicketError('Manage Server is required.');
+  const enabled=i.options.getBoolean('enabled',true);
+  store.toggleCategory(i.guildId,i.options.getString('category',true),enabled);
+  await i.editReply(enabled?'New tickets resumed for this category.':'New tickets paused. Existing tickets remain available.');
   return true;
 }

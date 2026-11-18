@@ -5,6 +5,7 @@ const command=(name,description,staff=false)=>{
   return c;
 };
 export const commands=[
+  command('ticket-toggle','Pause or resume new tickets in a category',true).addStringOption(o=>o.setName('category').setDescription('Configured category key').setRequired(true)).addBooleanOption(o=>o.setName('enabled').setDescription('Allow new tickets').setRequired(true)),
   command('ticket-config','Create or update a ticket category',true)
     .addStringOption(o=>o.setName('key').setDescription('Lowercase category key').setMaxLength(24).setRequired(true))
     .addChannelOption(o=>o.setName('parent').setDescription('Parent category').addChannelTypes(ChannelType.GuildCategory).setRequired(true))

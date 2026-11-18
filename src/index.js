@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits as I, Events, PermissionFlagsBits as P, ChannelType, MessageFlags,
   ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder } from 'discord.js';
 import { openStore, TicketError } from './store.js';
-import { handleTicketList } from './ticket-list.js';
+import { handleTicketList, handleCategoryToggle } from './ticket-list.js';
 import { collectMessages, renderTranscript } from './transcript.js';
 if(!process.env.DISCORD_TOKEN)throw Error('Missing DISCORD_TOKEN');
 const store=openStore(process.env.DATABASE_PATH || './data/app.sqlite');
@@ -18,6 +18,7 @@ client.on(Events.InteractionCreate,async i=>{
       const key=i.customId.slice(7);
       const cfg=store.category(i.guildId,key);
       if(!cfg)throw new TicketError('This panel is no longer configured.');
+      if(!cfg.enabled)throw new TicketError('New tickets in this category are paused.');
       const role=await i.guild.roles.fetch(cfg.staff);
       const parent=await i.guild.channels.fetch(cfg.parent);
       if(!role || role.id===i.guildId || parent?.type!==ChannelType.GuildCategory)throw new TicketError('The configured staff role or parent category no longer exists.');
@@ -39,6 +40,7 @@ client.on(Events.InteractionCreate,async i=>{
       await channel.send(`Ticket #${id}. Use /ticket-claim to claim or /ticket-close to archive and close. Transcripts are retained for the ticket owner and support staff.`);
       return;
     }
+    if(await handleCategoryToggle(i,member,store))return;
     if(i.commandName==='ticket-config'){
       requireManager(member);
       const role=i.options.getRole('staff',true);
@@ -49,7 +51,8 @@ client.on(Events.InteractionCreate,async i=>{
     if(i.commandName==='ticket-panel'){
       requireManager(member);
       const key=i.options.getString('category',true);
-      if(!store.category(i.guildId,key))throw new TicketError('Configure this category first.');
+      const cfg=store.category(i.guildId,key);
+      if(!cfg||!cfg.enabled)throw new TicketError('Configure and enable this category first.');
       if(i.channel?.type!==ChannelType.GuildText)throw new TicketError('Post panels in a server text channel.');
       await i.channel.send({content:`Open a ${key} support ticket. One active ticket per person.`,components:[new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId(`ticket:${key}`).setLabel('Open ticket').setStyle(ButtonStyle.Primary))]});
       return await i.editReply('Panel posted.');

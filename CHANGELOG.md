@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.2.0
+
+- Pause/resume new category tickets without affecting ongoing conversations or existing panels.
+- Re-register commands after upgrading. Existing categories and tickets are preserved during the automatic upgrade.
 
 - Add a private staff ticket queue with role-aware access, status/claim filters and pagination.
 

@@ -86,3 +86,15 @@ with `status:open`, `status:closing`, `status:creating` or `status:closed`, use
 staff role you currently hold are listed. Manage Server can list all tickets in
 the current server. No conversation text or transcripts are included.
 Re-register guild commands after updating.
+
+## Pause new tickets
+
+Manage Server can run `/ticket-toggle category:support enabled:false` to pause
+new tickets in a category. Existing panels show a private paused notice when
+clicked, and new panel posting is blocked. Existing tickets can still be claimed,
+closed and exported. Set `enabled:true` to resume without reposting panels.
+Reconfiguring a category preserves its paused setting.
+
+Back up before upgrading, then restart and re-register commands. Existing
+categories are enabled by default during the automatic database upgrade.
+Restore the pre-upgrade backup to roll back to a release without category pausing.
